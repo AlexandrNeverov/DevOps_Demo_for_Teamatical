@@ -1,0 +1,28 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Bicep
+*.bicep.json
+
+# Azure
+.azure/
+
+# .NET
+bin/
+obj/
+
+# User secrets / local configs
+*.user
+*.suo
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
