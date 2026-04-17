@@ -1,0 +1,46 @@
+param location string = 'eastus'
+param environment string = 'dev'
+
+param allowedSshSource string = '*'
+
+param vnetName string = 'vnet-${environment}'
+param addressPrefix string = '10.0.0.0/16'
+
+param webSubnetName string = 'web-subnet'
+param webSubnetPrefix string = '10.0.1.0/24'
+
+param dbSubnetName string = 'db-subnet'
+param dbSubnetPrefix string = '10.0.2.0/24'
+
+param gatewaySubnetName string = 'GatewaySubnet'
+param gatewaySubnetPrefix string = '10.0.3.0/24'
+
+module nsg './modules/nsg.bicep' = {
+  name: 'web-nsg-${environment}'
+  params: {
+    location: location
+    nsgName: 'web-nsg-${environment}'
+    allowedSshSource: allowedSshSource
+  }
+}
+
+module network './modules/network.bicep' = {
+  name: 'network-${environment}'
+  params: {
+    location: location
+    vnetName: vnetName
+    addressPrefix: addressPrefix
+    webSubnetName: webSubnetName
+    webSubnetPrefix: webSubnetPrefix
+    dbSubnetName: dbSubnetName
+    dbSubnetPrefix: dbSubnetPrefix
+    gatewaySubnetName: gatewaySubnetName
+    gatewaySubnetPrefix: gatewaySubnetPrefix
+    webNsgId: nsg.outputs.nsgId
+  }
+}
+
+output vnetId string = network.outputs.vnetId
+output webSubnetId string = network.outputs.webSubnetId
+output dbSubnetId string = network.outputs.dbSubnetId
+output gatewaySubnetId string = network.outputs.gatewaySubnetId
