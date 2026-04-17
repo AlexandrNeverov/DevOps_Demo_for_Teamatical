@@ -118,9 +118,120 @@ module sql './modules/sql.bicep' = {
     dbName: 'appdb'
 
   }
+ 
+} 
+  module observability './modules/observability.bicep' = {
 
+  name: 'obs-${environment}'
+
+  params: {
+
+    location: location
+
+    workspaceName: 'log-${environment}'
+
+    appInsightsName: 'appi-${environment}'
+
+  }
+  
 }
 
+resource appGw 'Microsoft.Network/applicationGateways@2023-09-01' existing = {
+  name: 'appgw-${environment}'
+}
+
+resource appGwDiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: 'appgw-diag'
+  scope: appGw
+  properties: {
+    workspaceId: observability.outputs.workspaceId
+    logs: [
+      {
+        category: 'ApplicationGatewayAccessLog'
+        enabled: true
+      }
+      {
+        category: 'ApplicationGatewayPerformanceLog'
+        enabled: true
+      }
+      {
+        category: 'ApplicationGatewayFirewallLog'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
+  }
+}
+
+resource vmExisting 'Microsoft.Compute/virtualMachines@2023-09-01' existing = {
+  name: 'vm-${environment}-01'
+}
+
+resource amaVmExtension 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = {
+  name: 'AzureMonitorWindowsAgent'
+  parent: vmExisting
+  location: location
+  properties: {
+    publisher: 'Microsoft.Azure.Monitor'
+    type: 'AzureMonitorWindowsAgent'
+    typeHandlerVersion: '1.0'
+    autoUpgradeMinorVersion: true
+  }
+}
+
+resource dcr 'Microsoft.Insights/dataCollectionRules@2023-03-11' = {
+  name: 'dcr-${environment}-vm'
+  location: location
+  properties: {
+    dataSources: {
+      performanceCounters: [
+        {
+          name: 'perfCounters'
+          streams: [
+            'Microsoft-Perf'
+          ]
+          samplingFrequencyInSeconds: 60
+          counterSpecifiers: [
+            '\\Processor(_Total)\\% Processor Time'
+            '\\Memory\\Available MBytes'
+            '\\LogicalDisk(_Total)\\% Free Space'
+          ]
+        }
+      ]
+    }
+    destinations: {
+      logAnalytics: [
+        {
+          name: 'laDest'
+          workspaceResourceId: observability.outputs.workspaceId
+        }
+      ]
+    }
+    dataFlows: [
+      {
+        streams: [
+          'Microsoft-Perf'
+        ]
+        destinations: [
+          'laDest'
+        ]
+      }
+    ]
+  }
+}
+
+resource dcrAssociation 'Microsoft.Insights/dataCollectionRuleAssociations@2023-03-11' = {
+  name: 'assoc-${environment}-vm'
+  scope: vmExisting
+  properties: {
+    dataCollectionRuleId: dcr.id
+  }
+}
 
 
 output vnetId string = network.outputs.vnetId
