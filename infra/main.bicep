@@ -109,7 +109,7 @@ module sql './modules/sql.bicep' = {
 
     location: location
 
-    sqlServerName: 'sql-${environment}'
+    sqlServerName: 'neverov-sql-${environment}'
 
     adminUsername: adminUsername
 

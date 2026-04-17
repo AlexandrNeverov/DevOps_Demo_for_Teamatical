@@ -1,8 +1,10 @@
 param location string
 param sqlServerName string
 param adminUsername string
+
 @secure()
 param adminPassword string
+
 param dbName string
 
 resource sqlServer 'Microsoft.Sql/servers@2022-05-01-preview' = {
@@ -16,7 +18,8 @@ resource sqlServer 'Microsoft.Sql/servers@2022-05-01-preview' = {
 }
 
 resource sqlDb 'Microsoft.Sql/servers/databases@2022-05-01-preview' = {
-  name: '${sqlServer.name}/${dbName}'
+  name: dbName
+  parent: sqlServer
   location: location
   sku: {
     name: 'Basic'
@@ -24,7 +27,8 @@ resource sqlDb 'Microsoft.Sql/servers/databases@2022-05-01-preview' = {
 }
 
 resource firewall 'Microsoft.Sql/servers/firewallRules@2022-05-01-preview' = {
-  name: '${sqlServer.name}/AllowAll'
+  name: 'AllowAll'
+  parent: sqlServer
   properties: {
     startIpAddress: '0.0.0.0'
     endIpAddress: '255.255.255.255'
@@ -32,3 +36,4 @@ resource firewall 'Microsoft.Sql/servers/firewallRules@2022-05-01-preview' = {
 }
 
 output sqlServerName string = sqlServer.name
+output sqlDbName string = sqlDb.name
