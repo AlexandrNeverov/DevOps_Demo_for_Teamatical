@@ -92,8 +92,6 @@ module appGateway './modules/app_gateway.bicep' = {
 
     appGwName: 'appgw-${environment}'
 
-    vnetId: network.outputs.vnetId
-
     gatewaySubnetId: network.outputs.gatewaySubnetId
 
     publicIpId: appGwPublicIp.outputs.publicIpId

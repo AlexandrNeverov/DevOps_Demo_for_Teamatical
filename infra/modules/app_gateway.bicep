@@ -1,21 +1,20 @@
 param location string
 param appGwName string
 
-param vnetId string
 param gatewaySubnetId string
-
 param publicIpId string
 param backendNicId string
 
 resource appGw 'Microsoft.Network/applicationGateways@2023-09-01' = {
   name: appGwName
   location: location
-  sku: {
-    name: 'Standard_v2'
-    tier: 'Standard_v2'
-    capacity: 1
-  }
   properties: {
+    sku: {
+      name: 'Standard_v2'
+      tier: 'Standard_v2'
+      capacity: 1
+    }
+
     gatewayIPConfigurations: [
       {
         name: 'appGatewayIpConfig'
@@ -92,6 +91,7 @@ resource appGw 'Microsoft.Network/applicationGateways@2023-09-01' = {
         name: 'rule1'
         properties: {
           ruleType: 'Basic'
+          priority: 100
           httpListener: {
             id: resourceId('Microsoft.Network/applicationGateways/httpListeners', appGwName, 'httpListener')
           }
