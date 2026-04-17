@@ -68,6 +68,43 @@ module vm './modules/vm.bicep' = {
   }
 }
 
+module appGwPublicIp './modules/public_ip.bicep' = {
+
+  name: 'appgw-pip-${environment}'
+
+  params: {
+
+    location: location
+
+    publicIpName: 'pip-${environment}-appgw'
+
+  }
+
+}
+
+module appGateway './modules/app_gateway.bicep' = {
+
+  name: 'appgw-${environment}'
+
+  params: {
+
+    location: location
+
+    appGwName: 'appgw-${environment}'
+
+    vnetId: network.outputs.vnetId
+
+    gatewaySubnetId: network.outputs.gatewaySubnetId
+
+    publicIpId: appGwPublicIp.outputs.publicIpId
+
+    backendNicId: nic.outputs.nicId
+
+  }
+
+}
+
+
 
 output vnetId string = network.outputs.vnetId
 output webSubnetId string = network.outputs.webSubnetId
