@@ -6,7 +6,7 @@ param nicId string
 param adminPassword string
 
 param adminUsername string
-param vmSize string = 'Standard_B2s'
+param vmSize string = 'Standard_NV4as_v4'
 
 resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   name: vmName
