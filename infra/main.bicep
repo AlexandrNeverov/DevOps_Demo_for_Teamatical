@@ -149,7 +149,9 @@ output dbSubnetId string = network.outputs.dbSubnetId
 output gatewaySubnetId string = network.outputs.gatewaySubnetId
 
 output nsgId string = nsg.outputs.nsgId
+
 output publicIpId string = publicIp.outputs.publicIpId
+output appGwPublicIpId string = appGwPublicIp.outputs.publicIpId
 
 
 output nicId string = nic.outputs.nicId
