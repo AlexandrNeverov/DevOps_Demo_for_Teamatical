@@ -16,6 +16,8 @@ param gatewaySubnetPrefix string = '10.0.3.0/24'
 param nsgName string = 'web-nsg-${environment}'
 param allowedSshSource string = '*'
 
+param nicName string = 'nic-${environment}-vm01'
+
 module network './modules/network.bicep' = {
   name: 'network-${environment}'
   params: {
@@ -41,4 +43,19 @@ module nsg './modules/nsg.bicep' = {
     network
   ]
 }
+
+module nic './modules/nic.bicep' = {
+  name: 'nic-${environment}'
+  params: {
+    location: location
+    nicName: nicName
+    subnetId: network.outputs.webSubnetId
+  }
+  dependsOn: [
+    nsg
+  ]
+}
+
 output vnetId string = network.outputs.vnetId
+output nsgId string = nsg.outputs.nsgId
+output nicId string = nic.outputs.nicId
