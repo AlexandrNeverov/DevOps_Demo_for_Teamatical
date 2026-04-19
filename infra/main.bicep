@@ -17,6 +17,8 @@ param nsgName string = 'web-nsg-${environment}'
 param allowedSshSource string = '*'
 
 param publicIpName string = 'pip-${environment}'
+param appGwPublicIpName string = 'pip-${environment}-appgw'
+
 param nicName string = 'nic-${environment}-vm01'
 param vmName string = 'vm-${environment}-01'
 
@@ -73,6 +75,14 @@ module publicIp './modules/public_ip.bicep' = {
   ]
 }
 
+module appGwPublicIp './modules/public_ip.bicep' = {
+  name: 'appgw-pip-${environment}'
+  params: {
+    location: location
+    publicIpName: appGwPublicIpName
+  }
+}
+
 module nic './modules/nic.bicep' = {
   name: 'nic-${environment}'
   params: {
@@ -124,7 +134,7 @@ module appGw './modules/app_gateway.bicep' = {
     location: location
     appGwName: appGwName
     gatewaySubnetId: network.outputs.gatewaySubnetId
-    publicIpId: publicIp.outputs.publicIpId
+    publicIpId: appGwPublicIp.outputs.publicIpId
     backendNicId: nic.outputs.nicId
   }
   dependsOn: [
@@ -139,7 +149,11 @@ output dbSubnetId string = network.outputs.dbSubnetId
 output gatewaySubnetId string = network.outputs.gatewaySubnetId
 
 output nsgId string = nsg.outputs.nsgId
+
 output publicIpId string = publicIp.outputs.publicIpId
+output appGwPublicIpId string = appGwPublicIp.outputs.publicIpId
+
+
 output nicId string = nic.outputs.nicId
 output vmId string = vm.outputs.vmId
 
