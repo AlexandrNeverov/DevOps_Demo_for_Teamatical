@@ -22,6 +22,15 @@ The initial version (v0.9) includes:
 
 The architecture is designed to be extendable and serves as a baseline for further iterations.
 
+## Architecture
+
+<p align="center">
+  <img src="arch.png" width="900">
+</p>
+<p align="center">
+  <i>Figure 1: Infrastructure Architecture with Future Extensions</i>
+</p>
+
 ---
 
 ## CI/CD Workflow
@@ -36,6 +45,15 @@ The main steps are:
 6. Infrastructure is deployed to Azure
 
 Infrastructure changes are applied only through CI, ensuring control and consistency.
+
+## CI/CD Workflow
+
+<p align="center">
+  <img src="pipe.png" width="900">
+</p>
+<p align="center">
+  <i>Figure 2: CI/CD Pipeline with Approval and Validation Stages</i>
+</p>
 
 ---
 
